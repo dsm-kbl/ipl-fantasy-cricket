@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "unit: Unit tests",
+    "property: Property-based tests (Hypothesis)",
+    "integration: Integration tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

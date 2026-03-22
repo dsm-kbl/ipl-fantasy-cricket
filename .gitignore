@@ -1,0 +1,33 @@
+# Environment files (contain secrets)
+.env
+*.env
+server/.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+client/node_modules/
+client/dist/
+
+# IDE
+.vscode/
+.idea/
+.kiro/
+*.swp
+*.swo
+.DS_Store
+
+# Database
+*.db
+*.sqlite3
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Logs
+*.log
