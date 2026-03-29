@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import PageBackground from "../components/PageBackground";
 import apiClient from "../api/client";
 import type { LeaderboardEntry, MatchOut } from "../types";
 
@@ -13,7 +14,6 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch overall leaderboard on mount and when switching to overall tab
   useEffect(() => {
     if (tab !== "overall") return;
     setLoading(true);
@@ -25,18 +25,13 @@ export default function LeaderboardPage() {
       .finally(() => setLoading(false));
   }, [tab]);
 
-  // Fetch matches list when switching to per-match tab
   useEffect(() => {
     if (tab !== "per-match") return;
     setEntries([]);
     setSelectedMatchId("");
-    apiClient
-      .get<MatchOut[]>("/matches")
-      .then((res) => setMatches(res.data))
-      .catch(() => setError("Failed to load matches."));
+    apiClient.get<MatchOut[]>("/matches").then((res) => setMatches(res.data)).catch(() => {});
   }, [tab]);
 
-  // Fetch per-match leaderboard when a match is selected
   useEffect(() => {
     if (tab !== "per-match" || !selectedMatchId) return;
     setLoading(true);
@@ -48,36 +43,42 @@ export default function LeaderboardPage() {
       .finally(() => setLoading(false));
   }, [tab, selectedMatchId]);
 
-  const tabClass = (t: Tab) =>
-    `px-4 py-2 text-sm font-medium rounded-t-lg ${
-      tab === t
-        ? "bg-white text-blue-600 border-b-2 border-blue-600"
-        : "text-gray-500 hover:text-gray-700"
-    }`;
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageBackground>
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Leaderboard</h1>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-6">Leaderboard</h1>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 border-b border-gray-200">
-          <button className={tabClass("overall")} onClick={() => setTab("overall")}>
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setTab("overall")}
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${
+              tab === "overall"
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow"
+                : "bg-white text-gray-500 border border-gray-200 hover:border-blue-300"
+            }`}
+          >
             Overall
           </button>
-          <button className={tabClass("per-match")} onClick={() => setTab("per-match")}>
+          <button
+            onClick={() => setTab("per-match")}
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${
+              tab === "per-match"
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow"
+                : "bg-white text-gray-500 border border-gray-200 hover:border-blue-300"
+            }`}
+          >
             Per Match
           </button>
         </div>
 
-        {/* Per-match selector */}
         {tab === "per-match" && (
-          <div className="mb-4">
+          <div className="mb-6">
             <select
               value={selectedMatchId}
               onChange={(e) => setSelectedMatchId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select a match</option>
               {matches.map((m) => (
@@ -89,49 +90,53 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-600 bg-red-50 p-4 rounded-xl mb-4">{error}</p>}
 
         {loading && (
-          <p className="text-center text-gray-500 mt-8">Loading…</p>
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto" />
+          </div>
         )}
 
         {!loading && entries.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-6 text-center text-gray-400 text-sm">
-            {tab === "per-match" && !selectedMatchId
-              ? "Select a match to view its leaderboard."
-              : "No leaderboard data available."}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+            <span className="text-3xl">🏆</span>
+            <p className="text-gray-400 mt-2 text-sm">
+              {tab === "per-match" && !selectedMatchId ? "Select a match to view its leaderboard." : "No leaderboard data available."}
+            </p>
           </div>
         )}
 
         {!loading && entries.length > 0 && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-100 text-gray-600 text-left">
-                <tr>
-                  <th className="px-4 py-3 w-16">Rank</th>
-                  <th className="px-4 py-3">Username</th>
-                  <th className="px-4 py-3 text-right">Total Points</th>
-                  <th className="px-4 py-3 text-right">Matches Played</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {entries.map((entry) => (
-                  <tr key={entry.username} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">#{entry.rank}</td>
-                    <td className="px-4 py-3 text-gray-800">{entry.username}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-blue-600">
-                      {entry.total_points}
-                    </td>
-                    <td className="px-4 py-3 text-right text-gray-500">
-                      {entry.matches_played}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {entries.map((entry, idx) => {
+              let rankBg = "bg-gray-50";
+              let rankText = "text-gray-600";
+              if (entry.rank === 1) { rankBg = "bg-yellow-50"; rankText = "text-yellow-600"; }
+              else if (entry.rank === 2) { rankBg = "bg-gray-100"; rankText = "text-gray-500"; }
+              else if (entry.rank === 3) { rankBg = "bg-orange-50"; rankText = "text-orange-500"; }
+
+              return (
+                <div
+                  key={entry.username}
+                  className={`flex items-center justify-between px-5 py-3.5 ${idx > 0 ? "border-t border-gray-100" : ""} hover:bg-blue-50/30 transition`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className={`w-8 h-8 rounded-full ${rankBg} ${rankText} flex items-center justify-center text-sm font-bold`}>
+                      {entry.rank <= 3 ? ["🥇", "🥈", "🥉"][entry.rank - 1] : `#${entry.rank}`}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{entry.username}</p>
+                      <p className="text-[10px] text-gray-400">{entry.matches_played} match{entry.matches_played !== 1 ? "es" : ""} played</p>
+                    </div>
+                  </div>
+                  <p className="text-lg font-extrabold text-blue-600">{entry.total_points}</p>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
-    </div>
+    </PageBackground>
   );
 }

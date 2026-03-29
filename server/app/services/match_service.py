@@ -61,7 +61,7 @@ async def get_match_with_player_pool(
     players_result = await db.execute(
         select(Player).where(
             or_(Player.franchise == match.team_a, Player.franchise == match.team_b)
-        )
+        ).order_by(Player.franchise, Player.name)
     )
     players = players_result.scalars().all()
 
@@ -76,5 +76,12 @@ async def get_upcoming_matches(db: AsyncSession) -> list[MatchOut]:
     result = await db.execute(
         select(Match).where(Match.status == MatchStatus.UPCOMING)
     )
+    matches = result.scalars().all()
+    return [MatchOut.model_validate(m) for m in matches]
+
+
+async def get_all_matches(db: AsyncSession) -> list[MatchOut]:
+    """Return all matches regardless of status."""
+    result = await db.execute(select(Match))
     matches = result.scalars().all()
     return [MatchOut.model_validate(m) for m in matches]

@@ -111,7 +111,7 @@ async def unhandled_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -123,3 +123,8 @@ app.include_router(admin.router)
 app.include_router(fantasy_teams.router)
 app.include_router(leaderboard.router)
 app.include_router(dashboard.router)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}

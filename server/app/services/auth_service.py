@@ -115,7 +115,7 @@ async def login(db: AsyncSession, email: str, password: str) -> AuthTokenRespons
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalars().first()
 
-    if user is None or not verify_password(password, user.password_hash):
+    if user is None:
         raise AuthError(
             status_code=401,
             error_response=ErrorResponse(
@@ -133,6 +133,17 @@ async def login(db: AsyncSession, email: str, password: str) -> AuthTokenRespons
                 error=ErrorBody(
                     code="EMAIL_NOT_VERIFIED",
                     message="Please verify your email before logging in. Check your inbox for the verification link.",
+                )
+            ),
+        )
+
+    if not verify_password(password, user.password_hash):
+        raise AuthError(
+            status_code=401,
+            error_response=ErrorResponse(
+                error=ErrorBody(
+                    code="AUTH_ERROR",
+                    message="Invalid email or password",
                 )
             ),
         )

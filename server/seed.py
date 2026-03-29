@@ -295,6 +295,7 @@ PLAYERS = [
     ("Shivang Kumar", PlayerRole.ALL_ROUNDER, SRH, 6.0),
     ("Pat Cummins", PlayerRole.BOWLER, SRH, 10.0),
     ("Jaydev Unadkat", PlayerRole.BOWLER, SRH, 7.0),
+    ("David Payne", PlayerRole.BOWLER, SRH, 6.5),
     ("Eshan Malinga", PlayerRole.BOWLER, SRH, 6.5),
     ("Sakib Hussain", PlayerRole.BOWLER, SRH, 6.0),
     ("Amit Kumar", PlayerRole.BOWLER, SRH, 6.0),
@@ -312,46 +313,46 @@ def ist(year, month, day, hour, minute=0):
     return datetime(year, month, day, hour, minute, tzinfo=IST).astimezone(timezone.utc).replace(tzinfo=None)
 
 MATCHES = [
-    # Match 1: Sat 28 Mar, 3:00 PM IST
-    (RCB, SRH, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 3, 28, 15, 0)),
-    # Match 2: Sun 29 Mar, 4:00 PM IST
-    (MI, KKR, "Wankhede Stadium, Mumbai", ist(2026, 3, 29, 16, 0)),
-    # Match 3: Mon 30 Mar, 4:00 PM IST
-    (RR, CSK, "ACA Stadium, Guwahati", ist(2026, 3, 30, 16, 0)),
-    # Match 4: Tue 31 Mar, 4:00 PM IST
-    (PBKS, GT, "PCA New Stadium, New Chandigarh", ist(2026, 3, 31, 16, 0)),
-    # Match 5: Wed 1 Apr, 4:00 PM IST
-    (LSG, DC, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 1, 16, 0)),
-    # Match 6: Thu 2 Apr, 4:00 PM IST
-    (KKR, SRH, "Eden Gardens, Kolkata", ist(2026, 4, 2, 16, 0)),
-    # Match 7: Fri 3 Apr, 4:00 PM IST
-    (CSK, PBKS, "MA Chidambaram Stadium, Chennai", ist(2026, 4, 3, 16, 0)),
-    # Match 8: Sat 4 Apr, 12:00 PM IST (D/N)
-    (DC, MI, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 4, 12, 0)),
-    # Match 9: Sat 4 Apr, 4:00 PM IST
-    (GT, RR, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 4, 16, 0)),
-    # Match 10: Sun 5 Apr, 12:00 PM IST (D/N)
-    (SRH, LSG, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 4, 5, 12, 0)),
-    # Match 11: Sun 5 Apr, 4:00 PM IST
-    (RCB, CSK, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 4, 5, 16, 0)),
-    # Match 12: Mon 6 Apr, 4:00 PM IST
-    (KKR, PBKS, "Eden Gardens, Kolkata", ist(2026, 4, 6, 16, 0)),
-    # Match 13: Tue 7 Apr, 4:00 PM IST
-    (RR, MI, "ACA Stadium, Guwahati", ist(2026, 4, 7, 16, 0)),
-    # Match 14: Wed 8 Apr, 4:00 PM IST
-    (DC, GT, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 8, 16, 0)),
-    # Match 15: Thu 9 Apr, 4:00 PM IST
-    (KKR, LSG, "Eden Gardens, Kolkata", ist(2026, 4, 9, 16, 0)),
-    # Match 16: Fri 10 Apr, 4:00 PM IST
-    (RR, RCB, "ACA Stadium, Guwahati", ist(2026, 4, 10, 16, 0)),
-    # Match 17: Sat 11 Apr, 12:00 PM IST (D/N)
-    (PBKS, SRH, "PCA New Stadium, New Chandigarh", ist(2026, 4, 11, 12, 0)),
-    # Match 18: Sat 11 Apr, 4:00 PM IST
-    (CSK, DC, "MA Chidambaram Stadium, Chennai", ist(2026, 4, 11, 16, 0)),
-    # Match 19: Sun 12 Apr, 12:00 PM IST (D/N)
-    (LSG, GT, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 12, 12, 0)),
-    # Match 20: Sun 12 Apr, 4:00 PM IST
-    (MI, RCB, "Wankhede Stadium, Mumbai", ist(2026, 4, 12, 16, 0)),
+    # Match 1: Sat 28 Mar, 7:30 PM IST (Night)
+    (RCB, SRH, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 3, 28, 19, 30)),
+    # Match 2: Sun 29 Mar, 7:30 PM IST (Night)
+    (MI, KKR, "Wankhede Stadium, Mumbai", ist(2026, 3, 29, 19, 30)),
+    # Match 3: Mon 30 Mar, 7:30 PM IST (Night)
+    (RR, CSK, "ACA Stadium, Guwahati", ist(2026, 3, 30, 19, 30)),
+    # Match 4: Tue 31 Mar, 7:30 PM IST (Night)
+    (PBKS, GT, "PCA New Stadium, New Chandigarh", ist(2026, 3, 31, 19, 30)),
+    # Match 5: Wed 1 Apr, 7:30 PM IST (Night)
+    (LSG, DC, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 1, 19, 30)),
+    # Match 6: Thu 2 Apr, 7:30 PM IST (Night)
+    (KKR, SRH, "Eden Gardens, Kolkata", ist(2026, 4, 2, 19, 30)),
+    # Match 7: Fri 3 Apr, 7:30 PM IST (Night)
+    (CSK, PBKS, "MA Chidambaram Stadium, Chennai", ist(2026, 4, 3, 19, 30)),
+    # Match 8: Sat 4 Apr, 3:30 PM IST (Day)
+    (DC, MI, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 4, 15, 30)),
+    # Match 9: Sat 4 Apr, 7:30 PM IST (Night)
+    (GT, RR, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 4, 19, 30)),
+    # Match 10: Sun 5 Apr, 3:30 PM IST (Day)
+    (SRH, LSG, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 4, 5, 15, 30)),
+    # Match 11: Sun 5 Apr, 7:30 PM IST (Night)
+    (RCB, CSK, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 4, 5, 19, 30)),
+    # Match 12: Mon 6 Apr, 7:30 PM IST (Night)
+    (KKR, PBKS, "Eden Gardens, Kolkata", ist(2026, 4, 6, 19, 30)),
+    # Match 13: Tue 7 Apr, 7:30 PM IST (Night)
+    (RR, MI, "ACA Stadium, Guwahati", ist(2026, 4, 7, 19, 30)),
+    # Match 14: Wed 8 Apr, 7:30 PM IST (Night)
+    (DC, GT, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 8, 19, 30)),
+    # Match 15: Thu 9 Apr, 7:30 PM IST (Night)
+    (KKR, LSG, "Eden Gardens, Kolkata", ist(2026, 4, 9, 19, 30)),
+    # Match 16: Fri 10 Apr, 7:30 PM IST (Night)
+    (RR, RCB, "ACA Stadium, Guwahati", ist(2026, 4, 10, 19, 30)),
+    # Match 17: Sat 11 Apr, 3:30 PM IST (Day)
+    (PBKS, SRH, "PCA New Stadium, New Chandigarh", ist(2026, 4, 11, 15, 30)),
+    # Match 18: Sat 11 Apr, 7:30 PM IST (Night)
+    (CSK, DC, "MA Chidambaram Stadium, Chennai", ist(2026, 4, 11, 19, 30)),
+    # Match 19: Sun 12 Apr, 3:30 PM IST (Day)
+    (LSG, GT, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 12, 15, 30)),
+    # Match 20: Sun 12 Apr, 7:30 PM IST (Night)
+    (MI, RCB, "Wankhede Stadium, Mumbai", ist(2026, 4, 12, 19, 30)),
 ]
 
 

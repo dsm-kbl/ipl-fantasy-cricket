@@ -58,6 +58,15 @@ async def update_player(
     return result
 
 
+@router.get("/matches", response_model=list[MatchOut])
+async def list_all_matches(
+    _admin: User = Depends(get_admin_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all matches regardless of status (admin only)."""
+    return await match_service.get_all_matches(db)
+
+
 @router.post("/matches", response_model=MatchOut, status_code=201)
 async def create_match(
     body: MatchCreate,
@@ -125,3 +134,6 @@ async def update_match_points(
     """
     await points_service.update_points(db, match_id, body.points)
     return await points_service.get_match_points(db, match_id)
+
+
+

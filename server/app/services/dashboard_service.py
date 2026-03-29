@@ -29,7 +29,7 @@ def _resolve_match_status(
     lockout_time = match.start_time - timedelta(hours=1)
     if now >= lockout_time:
         return "locked"
-    return "created" if has_team else "not_created"
+    return "created" if has_team else "not created"
 
 
 async def _find_user_rank(

@@ -1,14 +1,15 @@
-"""Email service for sending verification emails via Gmail SMTP."""
+"""Email service for sending verification emails via Mailjet HTTP API."""
 
 import logging
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
+import httpx
 
 from server.app.core.config import settings
 from server.app.core.security import create_access_token
 
 logger = logging.getLogger(__name__)
+
+MAILJET_API_URL = "https://api.mailjet.com/v3.1/send"
 
 
 def generate_verification_token(user_id: str) -> str:
@@ -18,9 +19,9 @@ def generate_verification_token(user_id: str) -> str:
 
 
 def send_verification_email(to_email: str, username: str, token: str) -> bool:
-    """Send a verification email with a clickable link."""
-    if not settings.smtp_user or not settings.smtp_password:
-        logger.warning("SMTP not configured — skipping verification email")
+    """Send a verification email via Mailjet HTTP API."""
+    if not settings.mailjet_api_key or not settings.mailjet_secret_key:
+        logger.warning("Mailjet API keys not configured — skipping verification email")
         return False
 
     verify_url = f"{settings.frontend_url}/verify-email?token={token}"
@@ -51,19 +52,34 @@ def send_verification_email(to_email: str, username: str, token: str) -> bool:
     </div>
     """
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Verify your IPL Fantasy Cricket account"
-    msg["From"] = f"IPL Fantasy Cricket <{settings.smtp_user}>"
-    msg["To"] = to_email
-    msg.attach(MIMEText(html, "html"))
-
     try:
-        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-            server.starttls()
-            server.login(settings.smtp_user, settings.smtp_password)
-            server.sendmail(settings.smtp_user, to_email, msg.as_string())
-        logger.info("Verification email sent to %s", to_email)
-        return True
+        response = httpx.post(
+            MAILJET_API_URL,
+            auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
+            json={
+                "Messages": [
+                    {
+                        "From": {"Email": settings.mailjet_sender_email, "Name": "IPL Fantasy Cricket"},
+                        "To": [{"Email": to_email, "Name": username}],
+                        "Subject": "Verify your IPL Fantasy Cricket account",
+                        "HTMLPart": html,
+                    }
+                ]
+            },
+            timeout=10.0,
+        )
+        if response.status_code == 200:
+            data = response.json()
+            status = data.get("Messages", [{}])[0].get("Status")
+            if status == "success":
+                logger.info("Verification email sent to %s", to_email)
+                return True
+            else:
+                logger.error("Mailjet send failed: %s", data)
+                return False
+        else:
+            logger.error("Mailjet API error: %s %s", response.status_code, response.text)
+            return False
     except Exception as exc:
         logger.error("Failed to send verification email: %s", exc)
         return False
