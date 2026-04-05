@@ -50,8 +50,12 @@ function TeamColumn({
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
 
   const filtered = useMemo(() => {
-    if (roleFilter === "ALL") return players;
-    return players.filter((p) => p.role === roleFilter);
+    return players.filter((p) => {
+      if (roleFilter === "OVERSEAS") return p.nationality && p.nationality !== "India";
+      if (roleFilter === "INDIAN") return !p.nationality || p.nationality === "India";
+      if (roleFilter !== "ALL") return p.role === roleFilter;
+      return true;
+    });
   }, [players, roleFilter]);
 
   return (
@@ -61,7 +65,7 @@ function TeamColumn({
         <p className="text-xs text-white/70 text-center">{players.length} players</p>
       </div>
       <div className="flex gap-1 p-2 bg-white border-x border-gray-200 flex-wrap justify-center">
-        {["ALL", ...Object.keys(ROLE_LABELS)].map((r) => (
+        {["ALL", ...Object.keys(ROLE_LABELS), "OVERSEAS", "INDIAN"].map((r) => (
           <button
             key={r}
             onClick={() => setRoleFilter(r)}
@@ -69,7 +73,7 @@ function TeamColumn({
               roleFilter === r ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
             }`}
           >
-            {r === "ALL" ? "All" : ROLE_LABELS[r]}
+            {r === "ALL" ? "All" : r === "OVERSEAS" ? "✈️ OS" : r === "INDIAN" ? "🇮🇳" : ROLE_LABELS[r]}
           </button>
         ))}
       </div>

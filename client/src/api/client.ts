@@ -38,9 +38,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      globalThis.location.href = "/login";
+      const isAuthRoute = globalThis.location.pathname === "/login" || globalThis.location.pathname === "/register";
+      if (!isAuthRoute) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        globalThis.location.href = "/login";
+      }
     }
 
     // Attach a parsed message so consuming code can use `error.userMessage`

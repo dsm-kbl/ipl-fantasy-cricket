@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import PageBackground from "../components/PageBackground";
 import apiClient from "../api/client";
 import type { DashboardMatchDetail } from "../types";
 
@@ -14,49 +15,39 @@ const ROLE_LABELS: Record<string, string> = {
 export default function DashboardMatchDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [detail, setDetail] = useState<DashboardMatchDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!id) return;
-    const fetchDetail = async () => {
-      try {
-        const res = await apiClient.get<DashboardMatchDetail>(`/dashboard/match/${id}`);
-        setDetail(res.data);
-      } catch {
-        setError("Failed to load match details.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDetail();
+    apiClient
+      .get<DashboardMatchDetail>(`/dashboard/match/${id}`)
+      .then((res) => setDetail(res.data))
+      .catch(() => setError("Failed to load match details."))
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <PageBackground>
         <Navbar />
-        <p className="text-center text-gray-500 mt-12">Loading match details…</p>
-      </div>
+        <div className="text-center py-16">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto" />
+        </div>
+      </PageBackground>
     );
   }
 
   if (error || !detail) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <PageBackground>
         <Navbar />
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <p className="text-red-600">{error || "Match detail not found."}</p>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="mt-4 text-blue-600 hover:underline text-sm"
-          >
-            ← Back to dashboard
-          </button>
+          <p className="text-red-600 bg-red-50 p-4 rounded-xl">{error}</p>
+          <button onClick={() => navigate("/dashboard")} className="mt-4 text-blue-600 hover:underline text-sm">← Back</button>
         </div>
-      </div>
+      </PageBackground>
     );
   }
 
@@ -64,80 +55,64 @@ export default function DashboardMatchDetailPage() {
   const date = new Date(match.start_time);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageBackground>
       <Navbar />
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Match header */}
-        <div className="bg-white rounded-lg shadow p-5 mb-6">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">
-            {match.team_a} vs {match.team_b}
-          </h1>
-          <p className="text-sm text-gray-600">
-            📅 {date.toLocaleDateString()} · 🕐{" "}
-            {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · 📍 {match.venue}
-          </p>
-          <div className="mt-3 flex items-center gap-3">
-            <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-700">
-              {match.status}
-            </span>
-            <span className="text-sm font-semibold text-gray-700">
-              Total Score: <span className="text-blue-600">{total_score}</span>
-            </span>
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 mb-6 text-white">
+          <h1 className="text-2xl font-extrabold mb-1">{match.team_a} vs {match.team_b}</h1>
+          <div className="flex items-center gap-4 text-sm text-blue-200">
+            <span>📅 {date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
+            <span>🕐 {date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+            <span>📍 {match.venue}</span>
+          </div>
+          <div className="mt-4 flex items-center gap-4">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white/20">{match.status}</span>
+            <span className="text-lg font-extrabold">Score: {total_score} pts</span>
           </div>
         </div>
 
-        {/* Team composition table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-          <div className="p-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800">Team Composition</h2>
+        {/* Team composition */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900">Your Team</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600 text-left">
+              <thead className="bg-gray-50 text-gray-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">#</th>
-                  <th className="px-4 py-3 font-medium">Player</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                  <th className="px-4 py-3 font-medium">Franchise</th>
-                  <th className="px-4 py-3 font-medium text-right">Cost</th>
-                  <th className="px-4 py-3 font-medium text-right">Points</th>
+                  <th className="text-left px-5 py-3 font-medium">#</th>
+                  <th className="text-left px-5 py-3 font-medium">Player</th>
+                  <th className="text-left px-5 py-3 font-medium">Role</th>
+                  <th className="text-left px-5 py-3 font-medium">Franchise</th>
+                  <th className="text-right px-5 py-3 font-medium">Cost</th>
+                  <th className="text-right px-5 py-3 font-medium">Points</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-50">
                 {players.map((player, idx) => (
-                  <tr key={player.player_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-500">{idx + 1}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{player.player_name}</td>
-                    <td className="px-4 py-3 text-gray-600">{ROLE_LABELS[player.role] || player.role}</td>
-                    <td className="px-4 py-3 text-gray-600">{player.franchise}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{player.cost}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-blue-600">
-                      {player.points ?? "—"}
-                    </td>
+                  <tr key={player.player_id} className="hover:bg-blue-50/30 transition">
+                    <td className="px-5 py-3 text-gray-400">{idx + 1}</td>
+                    <td className="px-5 py-3 font-medium text-gray-900">{player.player_name}</td>
+                    <td className="px-5 py-3 text-gray-500">{ROLE_LABELS[player.role] || player.role}</td>
+                    <td className="px-5 py-3 text-gray-500">{player.franchise}</td>
+                    <td className="px-5 py-3 text-right text-gray-500">{player.cost}</td>
+                    <td className="px-5 py-3 text-right font-bold text-blue-600">{player.points ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot className="bg-gray-50">
                 <tr>
-                  <td colSpan={5} className="px-4 py-3 font-semibold text-gray-800 text-right">
-                    Total
-                  </td>
-                  <td className="px-4 py-3 text-right font-bold text-blue-600">
-                    {total_score}
-                  </td>
+                  <td colSpan={5} className="px-5 py-3 font-bold text-gray-800 text-right">Total</td>
+                  <td className="px-5 py-3 text-right font-extrabold text-blue-600">{total_score}</td>
                 </tr>
               </tfoot>
             </table>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-blue-600 hover:underline text-sm"
-        >
-          ← Back to dashboard
-        </button>
+        <button onClick={() => navigate("/dashboard")} className="text-blue-600 hover:underline text-sm">← Back to dashboard</button>
       </div>
-    </div>
+    </PageBackground>
   );
 }

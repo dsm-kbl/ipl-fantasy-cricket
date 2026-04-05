@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.core.database import get_db
 from server.app.core.deps import get_current_user
-from server.app.models.user import User
+from server.app.models.user import User, UserRole
 from server.app.schemas.fantasy_team import FantasyTeamCreate, FantasyTeamOut, FantasyTeamUpdate
 from server.app.services.fantasy_team_service import (
     BudgetExceededError,
@@ -59,7 +59,19 @@ async def create_fantasy_team(
     """Create a fantasy team for a match.
 
     Validates team composition, checks lockout, checks budget, and saves.
+    Admins are not allowed to create fantasy teams.
     """
+    if current_user.role == UserRole.ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": {
+                    "code": "FORBIDDEN",
+                    "message": "Admin users cannot create fantasy teams",
+                    "details": [],
+                }
+            },
+        )
     try:
         return await create_team(db, current_user.id, body.match_id, body.player_ids, body.toss_prediction, body.motm_prediction)
     except TeamLockedError:

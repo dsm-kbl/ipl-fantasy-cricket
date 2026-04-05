@@ -1,8 +1,9 @@
 """Match service with CRUD operations and player pool auto-population."""
 
 import uuid
+from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from server.app.models.match import Match, MatchStatus
@@ -61,7 +62,7 @@ async def get_match_with_player_pool(
     players_result = await db.execute(
         select(Player).where(
             or_(Player.franchise == match.team_a, Player.franchise == match.team_b)
-        )
+        ).order_by(Player.franchise, Player.name)
     )
     players = players_result.scalars().all()
 
@@ -78,3 +79,40 @@ async def get_upcoming_matches(db: AsyncSession) -> list[MatchOut]:
     )
     matches = result.scalars().all()
     return [MatchOut.model_validate(m) for m in matches]
+
+
+async def get_all_matches(db: AsyncSession) -> list[MatchOut]:
+    """Return all matches regardless of status, with completed matches last."""
+    result = await db.execute(
+        select(Match).order_by(
+            (Match.status == MatchStatus.COMPLETED).asc(),
+            Match.start_time.asc(),
+        )
+    )
+    matches = result.scalars().all()
+    return [MatchOut.model_validate(m) for m in matches]
+
+
+async def auto_complete_past_matches(db: AsyncSession) -> int:
+    """Mark non-completed matches as COMPLETED if their match day has passed.
+
+    Returns the number of matches updated.
+    """
+    now = datetime.utcnow()  # noqa: DTZ003
+    # Start of today (midnight UTC) — any match before this is from a past day
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    result = await db.execute(
+        update(Match)
+        .where(
+            Match.status.in_([
+                MatchStatus.UPCOMING,
+                MatchStatus.LOCKED,
+                MatchStatus.IN_PROGRESS,
+            ]),
+            Match.start_time < today_start,
+        )
+        .values(status=MatchStatus.COMPLETED)
+    )
+    await db.commit()
+    return result.rowcount

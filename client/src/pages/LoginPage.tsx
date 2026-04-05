@@ -2,12 +2,14 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { AxiosError } from "axios";
-import type { ErrorResponse } from "../types";
+import apiClient from "../api/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,9 +23,12 @@ export default function LoginPage() {
       await login(email, password);
       navigate("/dashboard");
     } catch (err) {
-      const axiosError = err as AxiosError<ErrorResponse>;
-      const errorData = axiosError.response?.data?.error;
-      setError(errorData?.message || "Invalid email or password.");
+      const axiosError = err as AxiosError;
+      const data = axiosError.response?.data as Record<string, unknown> | undefined;
+      const errorObj = (data?.error ?? (data?.detail as Record<string, unknown>)?.error) as { code?: string; message?: string } | undefined;
+      setError(errorObj?.message || "Invalid email or password.");
+      setShowResend(errorObj?.code === "EMAIL_NOT_VERIFIED");
+      setResendStatus("idle");
     } finally {
       setIsSubmitting(false);
     }
@@ -84,6 +89,32 @@ export default function LoginPage() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 {error}
+              </div>
+            )}
+
+            {showResend && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm">
+                <p className="text-amber-800 mb-2">Didn't get the email? Check your spam folder, or resend it.</p>
+                <button
+                  type="button"
+                  disabled={resendStatus !== "idle"}
+                  onClick={async () => {
+                    setResendStatus("sending");
+                    try {
+                      await apiClient.post("/auth/resend-verification", { email });
+                      setResendStatus("sent");
+                    } catch {
+                      setResendStatus("idle");
+                    }
+                  }}
+                  className="text-amber-700 font-semibold hover:text-amber-900 underline disabled:opacity-50 disabled:no-underline"
+                >
+                  {resendStatus === "sending"
+                    ? "Sending..."
+                    : resendStatus === "sent"
+                      ? "✓ Verification email sent"
+                      : "Resend verification email"}
+                </button>
               </div>
             )}
 

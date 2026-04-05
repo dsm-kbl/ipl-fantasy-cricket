@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from server.app.models.fantasy_team import FantasyTeam
-from server.app.models.user import User
+from server.app.models.user import User, UserRole
 from server.app.schemas.leaderboard import LeaderboardEntry
 
 
@@ -15,6 +15,7 @@ async def get_overall_leaderboard(db: AsyncSession) -> list[LeaderboardEntry]:
     """Return the overall leaderboard ranked by cumulative points descending.
 
     Tiebreaker: users with more matches participated rank higher.
+    Admin users are excluded.
     """
     stmt = (
         select(
@@ -23,6 +24,7 @@ async def get_overall_leaderboard(db: AsyncSession) -> list[LeaderboardEntry]:
             func.count(FantasyTeam.id).label("matches_played"),
         )
         .join(FantasyTeam, FantasyTeam.user_id == User.id)
+        .where(User.role != UserRole.ADMIN)
         .group_by(User.id, User.username)
         .order_by(
             desc("total_points"),
@@ -47,7 +49,9 @@ async def get_overall_leaderboard(db: AsyncSession) -> list[LeaderboardEntry]:
 async def get_match_leaderboard(
     db: AsyncSession, match_id: UUID
 ) -> list[LeaderboardEntry]:
-    """Return the per-match leaderboard ranked by match score descending."""
+    """Return the per-match leaderboard ranked by match score descending.
+    Admin users are excluded.
+    """
     stmt = (
         select(
             User.username,
@@ -55,6 +59,7 @@ async def get_match_leaderboard(
         )
         .join(FantasyTeam, FantasyTeam.user_id == User.id)
         .where(FantasyTeam.match_id == match_id)
+        .where(User.role != UserRole.ADMIN)
         .order_by(desc("total_points"))
     )
 

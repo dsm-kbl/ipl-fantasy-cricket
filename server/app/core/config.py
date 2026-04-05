@@ -13,16 +13,16 @@ class Settings(BaseSettings):
     jwt_expiration_minutes: int = 60
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    cors_origins: str = "http://localhost:5173,http://localhost:3000"
 
-    # Email (Gmail SMTP)
-    smtp_host: str = "smtp.gmail.com"
-    smtp_port: int = 587
-    smtp_user: str = ""
-    smtp_password: str = ""
+    # Email (Mailjet HTTP API)
+    mailjet_api_key: str = ""
+    mailjet_secret_key: str = ""
+    mailjet_sender_email: str = "ipl.fantasy.cricket.xi@gmail.com"
+    feedback_recipient_email: str = "ipl.fantasy.cricket.xi@gmail.com"
     frontend_url: str = "http://localhost:3000"
 
-    model_config = {"env_prefix": "APP_", "env_file": ".env"}
+    model_config = {"env_prefix": "APP_", "env_file": ".env", "extra": "ignore"}
 
 
 settings = Settings()

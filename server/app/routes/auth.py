@@ -1,5 +1,7 @@
 """Authentication API routes."""
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,9 +32,11 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
         )
         await db.commit()
 
-        # Send verification email
+        # Send verification email in the background so the response isn't blocked
         token = generate_verification_token(str(user_out.id))
-        send_verification_email(body.email, body.username, token)
+        asyncio.get_event_loop().run_in_executor(
+            None, send_verification_email, body.email, body.username, token
+        )
 
         return {"message": "Account created. Please check your email to verify your account."}
     except AuthError as exc:
@@ -70,18 +74,25 @@ async def verify_email(token: str = Query(...), db: AsyncSession = Depends(get_d
 
 
 @router.post("/resend-verification")
-async def resend_verification(current_user: User = Depends(get_current_user)):
-    """Resend the verification email for the current user."""
-    if current_user.is_verified:
-        return {"message": "Email already verified"}
+async def resend_verification(body: dict, db: AsyncSession = Depends(get_db)):
+    """Resend the verification email. Accepts {"email": "..."} — no auth required."""
+    email = body.get("email", "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail={"error": {"code": "VALIDATION_ERROR", "message": "Email is required", "details": []}})
 
-    token = generate_verification_token(str(current_user.id))
-    sent = send_verification_email(current_user.email, current_user.username, token)
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalars().first()
 
-    if not sent:
-        raise HTTPException(status_code=500, detail={"error": {"code": "EMAIL_FAILED", "message": "Failed to send verification email", "details": []}})
+    # Always return success to avoid leaking whether an email exists
+    if not user or user.is_verified:
+        return {"message": "If that email is registered and unverified, a new verification link has been sent."}
 
-    return {"message": "Verification email sent"}
+    token = generate_verification_token(str(user.id))
+    asyncio.get_event_loop().run_in_executor(
+        None, send_verification_email, user.email, user.username, token
+    )
+
+    return {"message": "If that email is registered and unverified, a new verification link has been sent."}
 
 
 @router.post("/login", response_model=AuthTokenResponse)

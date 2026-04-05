@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import { AxiosError } from "axios";
 import type { ErrorResponse } from "../types";
 
@@ -12,8 +11,6 @@ export default function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -28,7 +25,8 @@ export default function RegisterPage() {
       setRegistered(true);
     } catch (err) {
       const axiosError = err as AxiosError<ErrorResponse>;
-      const errorData = axiosError.response?.data?.error ?? axiosError.response?.data?.detail?.error;
+      const respData = axiosError.response?.data as Record<string, unknown> | undefined;
+      const errorData = (respData?.error ?? (respData?.detail as Record<string, unknown>)?.error) as { message?: string; details?: Array<{ field?: string; message: string }> } | undefined;
       const details = errorData?.details ?? [];
 
       const errors: Record<string, string> = {};
@@ -116,7 +114,9 @@ export default function RegisterPage() {
                   >
                     Go to Login
                   </Link>
-                  <p className="text-xs text-gray-400 mt-4">Didn't receive it? Check your spam folder.</p>
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+                    💡 Didn't receive it? Check your spam/junk folder and mark it as "not spam".
+                  </div>
                 </div>
               </>
             ) : (

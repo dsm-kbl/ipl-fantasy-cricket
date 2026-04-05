@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import apiClient from "../../api/client";
-import type { MatchOut } from "../../types";
+import type { MatchOut, PlayerOut } from "../../types";
 
 const STATUSES = ["UPCOMING", "LOCKED", "IN_PROGRESS", "COMPLETED"] as const;
 
-const emptyForm = { team_a: "", team_b: "", venue: "", start_time: "", status: "UPCOMING" };
+const emptyForm = { team_a: "", team_b: "", venue: "", start_time: "", status: "UPCOMING", toss_winner: "", motm_player_id: "" };
 
 export default function MatchManagementPage() {
   const [matches, setMatches] = useState<MatchOut[]>([]);
@@ -16,11 +16,12 @@ export default function MatchManagementPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [matchPlayers, setMatchPlayers] = useState<PlayerOut[]>([]);
 
   const fetchMatches = () => {
     setLoading(true);
     apiClient
-      .get<MatchOut[]>("/matches")
+      .get<MatchOut[]>("/admin/matches")
       .then((res) => setMatches(res.data))
       .catch(() => setError("Failed to load matches."))
       .finally(() => setLoading(false));
@@ -34,6 +35,7 @@ export default function MatchManagementPage() {
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(false);
+    setMatchPlayers([]);
     setError("");
     setSuccess("");
   };
@@ -45,11 +47,18 @@ export default function MatchManagementPage() {
       venue: match.venue,
       start_time: match.start_time.slice(0, 16),
       status: match.status,
+      toss_winner: match.toss_winner || "",
+      motm_player_id: match.motm_player_id || "",
     });
     setEditingId(match.id);
     setShowForm(true);
     setError("");
     setSuccess("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Fetch players for MOTM dropdown
+    apiClient.get(`/matches/${match.id}`).then((res) => {
+      setMatchPlayers(res.data.players ?? []);
+    }).catch(() => setMatchPlayers([]));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +72,8 @@ export default function MatchManagementPage() {
       venue: form.venue.trim(),
       start_time: form.start_time,
       status: form.status,
+      toss_winner: form.toss_winner.trim() || null,
+      motm_player_id: form.motm_player_id.trim() || null,
     };
 
     if (!payload.team_a || !payload.team_b || !payload.venue || !payload.start_time) {
@@ -164,6 +175,33 @@ export default function MatchManagementPage() {
                 >
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>{s.replace("_", " ")}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="match-toss-winner" className="block text-sm font-medium text-gray-700 mb-1">Toss Winner</label>
+                <select
+                  id="match-toss-winner"
+                  value={form.toss_winner}
+                  onChange={(e) => setForm({ ...form, toss_winner: e.target.value })}
+                  className="w-full border rounded px-3 py-2 text-sm"
+                >
+                  <option value="">— Not set —</option>
+                  {form.team_a && <option value={form.team_a}>{form.team_a}</option>}
+                  {form.team_b && <option value={form.team_b}>{form.team_b}</option>}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="match-motm" className="block text-sm font-medium text-gray-700 mb-1">Man of the Match</label>
+                <select
+                  id="match-motm"
+                  value={form.motm_player_id}
+                  onChange={(e) => setForm({ ...form, motm_player_id: e.target.value })}
+                  className="w-full border rounded px-3 py-2 text-sm"
+                >
+                  <option value="">— Not set —</option>
+                  {matchPlayers.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.franchise})</option>
                   ))}
                 </select>
               </div>

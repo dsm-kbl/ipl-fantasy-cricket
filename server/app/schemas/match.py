@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from server.app.schemas.player import PlayerOut
 
@@ -18,6 +18,11 @@ class MatchOut(BaseModel):
     status: str
     toss_winner: str | None = None
     motm_player_id: uuid.UUID | None = None
+
+    @field_serializer("start_time")
+    def serialize_start_time(self, value: datetime) -> str:
+        """Ensure start_time is serialized with Z suffix so browsers treat it as UTC."""
+        return value.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 class MatchCreate(BaseModel):

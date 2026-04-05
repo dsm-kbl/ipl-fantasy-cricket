@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from server.app.core.config import settings
 from server.app.core.exceptions import AppError
-from server.app.routes import admin, auth, dashboard, fantasy_teams, leaderboard, matches
+from server.app.routes import admin, auth, dashboard, fantasy_teams, feedback, leaderboard, matches
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ async def unhandled_error_handler(_request: Request, exc: Exception) -> JSONResp
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -123,3 +123,9 @@ app.include_router(admin.router)
 app.include_router(fantasy_teams.router)
 app.include_router(leaderboard.router)
 app.include_router(dashboard.router)
+app.include_router(feedback.router)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}

@@ -20,6 +20,7 @@ from server.app.schemas.dashboard import (
 )
 from server.app.schemas.match import MatchOut
 from server.app.services.leaderboard_service import get_overall_leaderboard
+from server.app.services.match_service import auto_complete_past_matches
 
 
 def _resolve_match_status(
@@ -29,7 +30,7 @@ def _resolve_match_status(
     lockout_time = match.start_time - timedelta(hours=1)
     if now >= lockout_time:
         return "locked"
-    return "created" if has_team else "not_created"
+    return "created" if has_team else "not created"
 
 
 async def _find_user_rank(
@@ -75,16 +76,25 @@ async def get_dashboard(db: AsyncSession, user_id: UUID) -> DashboardResponse:
         )
         team_match_ids.add(team.match_id)
 
+    participated.sort(key=lambda p: p.match.start_time, reverse=True)
+
     # --- Overall rank ---
     leaderboard = await get_overall_leaderboard(db)
     overall_rank = await _find_user_rank(db, user_id, leaderboard)
 
+    # --- Auto-complete matches from past days ---
+    await auto_complete_past_matches(db)
+
     # --- Upcoming matches with team status ---
     now = datetime.utcnow()  # noqa: DTZ003
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     upcoming_result = await db.execute(
-        select(Match).where(
-            Match.status.in_([MatchStatus.UPCOMING, MatchStatus.LOCKED])
+        select(Match)
+        .where(
+            Match.status.in_([MatchStatus.UPCOMING, MatchStatus.LOCKED]),
+            Match.start_time >= today_start,
         )
+        .order_by(Match.start_time.asc())
     )
     upcoming: list[UpcomingMatchStatus] = [
         UpcomingMatchStatus(
