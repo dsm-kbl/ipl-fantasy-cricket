@@ -41,6 +41,7 @@ async def get_overall_leaderboard(db: AsyncSession) -> list[LeaderboardEntry]:
             username=row.username,
             total_points=row.total_points,
             matches_played=row.matches_played,
+            avg_points_per_match=round(row.total_points / row.matches_played, 1) if row.matches_played > 0 else 0,
         )
         for idx, row in enumerate(rows)
     ]
@@ -72,6 +73,7 @@ async def get_match_leaderboard(
             username=row.username,
             total_points=row.total_points,
             matches_played=1,
+            avg_points_per_match=round(row.total_points, 1),
         )
         for idx, row in enumerate(rows)
     ]

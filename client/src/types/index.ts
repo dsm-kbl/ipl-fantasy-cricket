@@ -55,6 +55,7 @@ export interface LeaderboardEntry {
   username: string;
   total_points: number;
   matches_played: number;
+  avg_points_per_match: number;
 }
 
 export interface PlayerPointsOut {

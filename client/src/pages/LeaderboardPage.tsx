@@ -5,6 +5,7 @@ import apiClient from "../api/client";
 import type { LeaderboardEntry, MatchOut } from "../types";
 
 type Tab = "overall" | "per-match";
+type SortBy = "total" | "avg";
 
 export default function LeaderboardPage() {
   const [tab, setTab] = useState<Tab>("overall");
@@ -13,6 +14,15 @@ export default function LeaderboardPage() {
   const [selectedMatchId, setSelectedMatchId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sortBy, setSortBy] = useState<SortBy>("total");
+
+  const sortedEntries = tab === "overall"
+    ? [...entries].sort((a, b) =>
+        sortBy === "avg"
+          ? b.avg_points_per_match - a.avg_points_per_match || b.total_points - a.total_points
+          : b.total_points - a.total_points || b.matches_played - a.matches_played
+      ).map((e, idx) => ({ ...e, rank: idx + 1 }))
+    : entries;
 
   useEffect(() => {
     if (tab !== "overall") return;
@@ -73,6 +83,32 @@ export default function LeaderboardPage() {
           </button>
         </div>
 
+        {tab === "overall" && (
+          <div className="flex gap-2 mb-4">
+            <span className="text-xs text-gray-400 self-center mr-1">Sort by:</span>
+            <button
+              onClick={() => setSortBy("total")}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition ${
+                sortBy === "total"
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : "bg-gray-50 text-gray-500 border border-gray-200 hover:border-blue-200"
+              }`}
+            >
+              Total Points
+            </button>
+            <button
+              onClick={() => setSortBy("avg")}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition ${
+                sortBy === "avg"
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : "bg-gray-50 text-gray-500 border border-gray-200 hover:border-blue-200"
+              }`}
+            >
+              Avg / Match
+            </button>
+          </div>
+        )}
+
         {tab === "per-match" && (
           <div className="mb-6">
             <select
@@ -98,7 +134,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {!loading && entries.length === 0 && (
+        {!loading && sortedEntries.length === 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
             <span className="text-3xl">🏆</span>
             <p className="text-gray-400 mt-2 text-sm">
@@ -107,9 +143,9 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {!loading && entries.length > 0 && (
+        {!loading && sortedEntries.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            {entries.map((entry, idx) => {
+            {sortedEntries.map((entry, idx) => {
               let rankBg = "bg-gray-50";
               let rankText = "text-gray-600";
               if (entry.rank === 1) { rankBg = "bg-yellow-50"; rankText = "text-yellow-600"; }
@@ -130,7 +166,18 @@ export default function LeaderboardPage() {
                       <p className="text-[10px] text-gray-400">{entry.matches_played} match{entry.matches_played !== 1 ? "es" : ""} played</p>
                     </div>
                   </div>
-                  <p className="text-lg font-extrabold text-blue-600">{entry.total_points}</p>
+                  <div className="flex items-center gap-6">
+                    {tab === "overall" && (
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-gray-500">{entry.avg_points_per_match}</p>
+                        <p className="text-[10px] text-gray-400">avg/match</p>
+                      </div>
+                    )}
+                    <div className="text-right">
+                      <p className="text-lg font-extrabold text-blue-600">{entry.total_points}</p>
+                      <p className="text-[10px] text-gray-400">total</p>
+                    </div>
+                  </div>
                 </div>
               );
             })}

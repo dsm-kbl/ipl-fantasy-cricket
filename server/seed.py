@@ -353,6 +353,106 @@ MATCHES = [
     (LSG, GT, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 12, 15, 30)),
     # Match 20: Sun 12 Apr, 7:30 PM IST (Night)
     (MI, RCB, "Wankhede Stadium, Mumbai", ist(2026, 4, 12, 19, 30)),
+    # Match 21: Mon 13 Apr, 7:30 PM IST (Night)
+    (SRH, RR, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 4, 13, 19, 30)),
+    # Match 22: Tue 14 Apr, 7:30 PM IST (Night)
+    (CSK, KKR, "MA Chidambaram Stadium, Chennai", ist(2026, 4, 14, 19, 30)),
+    # Match 23: Wed 15 Apr, 7:30 PM IST (Night)
+    (RCB, LSG, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 4, 15, 19, 30)),
+    # Match 24: Thu 16 Apr, 7:30 PM IST (Night)
+    (MI, PBKS, "Wankhede Stadium, Mumbai", ist(2026, 4, 16, 19, 30)),
+    # Match 25: Fri 17 Apr, 7:30 PM IST (Night)
+    (GT, KKR, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 17, 19, 30)),
+    # Match 26: Sat 18 Apr, 3:30 PM IST (Day)
+    (RCB, DC, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 4, 18, 15, 30)),
+    # Match 27: Sat 18 Apr, 7:30 PM IST (Night)
+    (SRH, CSK, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 4, 18, 19, 30)),
+    # Match 28: Sun 19 Apr, 3:30 PM IST (Day)
+    (KKR, RR, "Eden Gardens, Kolkata", ist(2026, 4, 19, 15, 30)),
+    # Match 29: Sun 19 Apr, 7:30 PM IST (Night)
+    (PBKS, LSG, "PCA New Stadium, New Chandigarh", ist(2026, 4, 19, 19, 30)),
+    # Match 30: Mon 20 Apr, 7:30 PM IST (Night)
+    (GT, MI, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 20, 19, 30)),
+    # Match 31: Tue 21 Apr, 7:30 PM IST (Night)
+    (SRH, DC, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 4, 21, 19, 30)),
+    # Match 32: Wed 22 Apr, 7:30 PM IST (Night)
+    (LSG, RR, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 22, 19, 30)),
+    # Match 33: Thu 23 Apr, 7:30 PM IST (Night)
+    (MI, CSK, "Wankhede Stadium, Mumbai", ist(2026, 4, 23, 19, 30)),
+    # Match 34: Fri 24 Apr, 7:30 PM IST (Night)
+    (RCB, GT, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 4, 24, 19, 30)),
+    # Match 35: Sat 25 Apr, 3:30 PM IST (Day)
+    (DC, PBKS, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 25, 15, 30)),
+    # Match 36: Sat 25 Apr, 7:30 PM IST (Night)
+    (RR, SRH, "ACA Stadium, Guwahati", ist(2026, 4, 25, 19, 30)),
+    # Match 37: Sun 26 Apr, 3:30 PM IST (Day)
+    (GT, CSK, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 26, 15, 30)),
+    # Match 38: Sun 26 Apr, 7:30 PM IST (Night)
+    (LSG, KKR, "BRSABV Ekana Stadium, Lucknow", ist(2026, 4, 26, 19, 30)),
+    # Match 39: Mon 27 Apr, 7:30 PM IST (Night)
+    (DC, RCB, "Arun Jaitley Stadium, Delhi", ist(2026, 4, 27, 19, 30)),
+    # Match 40: Tue 28 Apr, 7:30 PM IST (Night)
+    (PBKS, RR, "PCA New Stadium, New Chandigarh", ist(2026, 4, 28, 19, 30)),
+    # Match 41: Wed 29 Apr, 7:30 PM IST (Night)
+    (MI, SRH, "Wankhede Stadium, Mumbai", ist(2026, 4, 29, 19, 30)),
+    # Match 42: Thu 30 Apr, 7:30 PM IST (Night)
+    (GT, RCB, "Narendra Modi Stadium, Ahmedabad", ist(2026, 4, 30, 19, 30)),
+    # Match 43: Fri 1 May, 7:30 PM IST (Night)
+    (RR, DC, "ACA Stadium, Guwahati", ist(2026, 5, 1, 19, 30)),
+    # Match 44: Sat 2 May, 7:30 PM IST (Night)
+    (CSK, MI, "MA Chidambaram Stadium, Chennai", ist(2026, 5, 2, 19, 30)),
+    # Match 45: Sun 3 May, 3:30 PM IST (Day)
+    (SRH, KKR, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 5, 3, 15, 30)),
+    # Match 46: Sun 3 May, 7:30 PM IST (Night)
+    (GT, PBKS, "Narendra Modi Stadium, Ahmedabad", ist(2026, 5, 3, 19, 30)),
+    # Match 47: Mon 4 May, 7:30 PM IST (Night)
+    (MI, LSG, "Wankhede Stadium, Mumbai", ist(2026, 5, 4, 19, 30)),
+    # Match 48: Tue 5 May, 7:30 PM IST (Night)
+    (DC, CSK, "Arun Jaitley Stadium, Delhi", ist(2026, 5, 5, 19, 30)),
+    # Match 49: Wed 6 May, 7:30 PM IST (Night)
+    (SRH, PBKS, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 5, 6, 19, 30)),
+    # Match 50: Thu 7 May, 7:30 PM IST (Night)
+    (LSG, RCB, "BRSABV Ekana Stadium, Lucknow", ist(2026, 5, 7, 19, 30)),
+    # Match 51: Fri 8 May, 7:30 PM IST (Night)
+    (DC, KKR, "Arun Jaitley Stadium, Delhi", ist(2026, 5, 8, 19, 30)),
+    # Match 52: Sat 9 May, 7:30 PM IST (Night)
+    (RR, GT, "ACA Stadium, Guwahati", ist(2026, 5, 9, 19, 30)),
+    # Match 53: Sun 10 May, 3:30 PM IST (Day)
+    (CSK, LSG, "MA Chidambaram Stadium, Chennai", ist(2026, 5, 10, 15, 30)),
+    # Match 54: Sun 10 May, 7:30 PM IST (Night)
+    (RCB, MI, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 5, 10, 19, 30)),
+    # Match 55: Mon 11 May, 7:30 PM IST (Night)
+    (PBKS, DC, "PCA New Stadium, New Chandigarh", ist(2026, 5, 11, 19, 30)),
+    # Match 56: Tue 12 May, 7:30 PM IST (Night)
+    (GT, SRH, "Narendra Modi Stadium, Ahmedabad", ist(2026, 5, 12, 19, 30)),
+    # Match 57: Wed 13 May, 7:30 PM IST (Night)
+    (RCB, KKR, "M. Chinnaswamy Stadium, Bengaluru", ist(2026, 5, 13, 19, 30)),
+    # Match 58: Thu 14 May, 7:30 PM IST (Night)
+    (PBKS, MI, "PCA New Stadium, New Chandigarh", ist(2026, 5, 14, 19, 30)),
+    # Match 59: Fri 15 May, 7:30 PM IST (Night)
+    (LSG, CSK, "BRSABV Ekana Stadium, Lucknow", ist(2026, 5, 15, 19, 30)),
+    # Match 60: Sat 16 May, 7:30 PM IST (Night)
+    (KKR, GT, "Eden Gardens, Kolkata", ist(2026, 5, 16, 19, 30)),
+    # Match 61: Sun 17 May, 3:30 PM IST (Day)
+    (PBKS, RCB, "PCA New Stadium, New Chandigarh", ist(2026, 5, 17, 15, 30)),
+    # Match 62: Sun 17 May, 7:30 PM IST (Night)
+    (DC, RR, "Arun Jaitley Stadium, Delhi", ist(2026, 5, 17, 19, 30)),
+    # Match 63: Mon 18 May, 7:30 PM IST (Night)
+    (CSK, SRH, "MA Chidambaram Stadium, Chennai", ist(2026, 5, 18, 19, 30)),
+    # Match 64: Tue 19 May, 7:30 PM IST (Night)
+    (RR, LSG, "ACA Stadium, Guwahati", ist(2026, 5, 19, 19, 30)),
+    # Match 65: Wed 20 May, 7:30 PM IST (Night)
+    (KKR, MI, "Eden Gardens, Kolkata", ist(2026, 5, 20, 19, 30)),
+    # Match 66: Thu 21 May, 7:30 PM IST (Night)
+    (CSK, GT, "MA Chidambaram Stadium, Chennai", ist(2026, 5, 21, 19, 30)),
+    # Match 67: Fri 22 May, 7:30 PM IST (Night)
+    (SRH, RCB, "Rajiv Gandhi Intl Stadium, Hyderabad", ist(2026, 5, 22, 19, 30)),
+    # Match 68: Sat 23 May, 7:30 PM IST (Night)
+    (LSG, PBKS, "BRSABV Ekana Stadium, Lucknow", ist(2026, 5, 23, 19, 30)),
+    # Match 69: Sun 24 May, 3:30 PM IST (Day)
+    (MI, RR, "Wankhede Stadium, Mumbai", ist(2026, 5, 24, 15, 30)),
+    # Match 70: Sun 24 May, 7:30 PM IST (Night)
+    (KKR, DC, "Eden Gardens, Kolkata", ist(2026, 5, 24, 19, 30)),
 ]
 
 

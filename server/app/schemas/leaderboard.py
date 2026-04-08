@@ -6,3 +6,4 @@ class LeaderboardEntry(BaseModel):
     username: str
     total_points: float
     matches_played: int
+    avg_points_per_match: float
