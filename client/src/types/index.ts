@@ -97,6 +97,9 @@ export interface DashboardMatchDetail {
   team_id: string;
   total_score: number;
   players: MatchDetailPlayer[];
+  toss_prediction: string | null;
+  motm_prediction: string | null;
+  motm_player_name: string | null;
 }
 
 export interface ErrorDetail {

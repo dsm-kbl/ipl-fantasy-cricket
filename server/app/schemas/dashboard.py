@@ -48,3 +48,6 @@ class DashboardMatchDetail(BaseModel):
     team_id: uuid.UUID
     total_score: float
     players: list[MatchDetailPlayer]
+    toss_prediction: str | None = None
+    motm_prediction: uuid.UUID | None = None
+    motm_player_name: str | None = None

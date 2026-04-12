@@ -78,6 +78,8 @@ PLAYERS = [
     ("Shreyas Gopal", PlayerRole.BOWLER, CSK, 7.0),
     ("Gurjapneet Singh", PlayerRole.BOWLER, CSK, 6.5),
     ("Mukesh Choudhary", PlayerRole.BOWLER, CSK, 6.5),
+    ("Spencer Johnson", PlayerRole.BOWLER, CSK, 7.5),
+    ("Nathan Ellis", PlayerRole.BOWLER, CSK, 7.0),
 
     # Delhi Capitals (IPL 2026 actual squad from ESPNcricinfo)
     # Batters
@@ -137,6 +139,7 @@ PLAYERS = [
     ("Luke Wood", PlayerRole.BOWLER, GT, 7.0),
     ("Ashok Sharma", PlayerRole.BOWLER, GT, 6.0),
     ("Prithvi Raj", PlayerRole.BOWLER, GT, 6.0),
+    ("Kulwant Khejroliya", PlayerRole.BOWLER, GT, 6.5),
     ("Jayant Yadav", PlayerRole.BOWLER, GT, 6.5),
 
     # Kolkata Knight Riders (IPL 2026 actual squad from ESPNcricinfo)
@@ -162,12 +165,15 @@ PLAYERS = [
     ("Varun Chakravarthy", PlayerRole.BOWLER, KKR, 9.0),
     ("Matheesha Pathirana", PlayerRole.BOWLER, KKR, 9.0),
     ("Harshit Rana", PlayerRole.BOWLER, KKR, 8.0),
+    ("Saurabh Dubey", PlayerRole.BOWLER, KKR, 7.0),
     ("Blessing Muzarabani", PlayerRole.BOWLER, KKR, 7.5),
     ("Akash Deep", PlayerRole.BOWLER, KKR, 7.5),
     ("Umran Malik", PlayerRole.BOWLER, KKR, 7.5),
     ("Vaibhav Arora", PlayerRole.BOWLER, KKR, 7.0),
     ("Kartik Tyagi", PlayerRole.BOWLER, KKR, 6.5),
     ("Prashant Solanki", PlayerRole.BOWLER, KKR, 6.5),
+    ("Navdeep Saini", PlayerRole.BOWLER, KKR, 7.0),
+    ("Mustafizur Rahman", PlayerRole.BOWLER, KKR, 8.0),
 
     # Lucknow Super Giants (IPL 2026 actual squad from ESPNcricinfo)
     ("Rishabh Pant", PlayerRole.WICKET_KEEPER, LSG, 10.5),
@@ -195,6 +201,7 @@ PLAYERS = [
     ("Digvesh Rathi", PlayerRole.BOWLER, LSG, 6.0),
     ("Arjun Tendulkar", PlayerRole.BOWLER, LSG, 6.0),
     ("Naman Tiwari", PlayerRole.BOWLER, LSG, 6.0),
+    ("George Linde", PlayerRole.ALL_ROUNDER, LSG, 7.0),
 
     # Punjab Kings (IPL 2026 actual squad from ESPNcricinfo)
     ("Shreyas Iyer", PlayerRole.BATSMAN, PBKS, 10.0),
@@ -235,6 +242,8 @@ PLAYERS = [
     ("Ravi Singh", PlayerRole.BATSMAN, RR, 6.0),
     ("Ravindra Jadeja", PlayerRole.ALL_ROUNDER, RR, 9.5),
     ("Donovan Ferreira", PlayerRole.ALL_ROUNDER, RR, 7.0),
+    ("Sam Curran", PlayerRole.ALL_ROUNDER, RR, 9.0),
+    ("Dasun Shanaka", PlayerRole.ALL_ROUNDER, RR, 7.5),
     ("Jofra Archer", PlayerRole.BOWLER, RR, 9.5),
     ("Ravi Bishnoi", PlayerRole.BOWLER, RR, 8.0),
     ("Tushar Deshpande", PlayerRole.BOWLER, RR, 7.5),
@@ -293,6 +302,7 @@ PLAYERS = [
     ("Harsh Dubey", PlayerRole.ALL_ROUNDER, SRH, 6.5),
     ("Krains Fuletra", PlayerRole.ALL_ROUNDER, SRH, 6.0),
     ("Shivang Kumar", PlayerRole.ALL_ROUNDER, SRH, 6.0),
+    ("Jack Edwards", PlayerRole.ALL_ROUNDER, SRH, 6.5),
     ("Pat Cummins", PlayerRole.BOWLER, SRH, 10.0),
     ("Jaydev Unadkat", PlayerRole.BOWLER, SRH, 7.0),
     ("David Payne", PlayerRole.BOWLER, SRH, 6.5),

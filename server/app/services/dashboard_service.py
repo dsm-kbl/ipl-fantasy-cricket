@@ -139,6 +139,17 @@ async def get_dashboard_match_detail(
     )
     points_map = {pp.player_id: pp.points for pp in pp_result.scalars().all()}
 
+    # Resolve MOTM prediction player name
+    motm_player_name = None
+    if team.motm_prediction:
+        from server.app.models.player import Player
+        motm_result = await db.execute(
+            select(Player.name).where(Player.id == team.motm_prediction)
+        )
+        row = motm_result.first()
+        if row:
+            motm_player_name = row[0]
+
     players = [
         MatchDetailPlayer(
             player_id=tp.player.id,
@@ -156,4 +167,7 @@ async def get_dashboard_match_detail(
         team_id=team.id,
         total_score=team.total_score,
         players=players,
+        toss_prediction=team.toss_prediction,
+        motm_prediction=team.motm_prediction,
+        motm_player_name=motm_player_name,
     )

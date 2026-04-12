@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from server.app.models.fantasy_team import FantasyTeam
+from server.app.models.match import Match, MatchStatus
 from server.app.models.user import User, UserRole
 from server.app.schemas.leaderboard import LeaderboardEntry
 
@@ -24,7 +25,9 @@ async def get_overall_leaderboard(db: AsyncSession) -> list[LeaderboardEntry]:
             func.count(FantasyTeam.id).label("matches_played"),
         )
         .join(FantasyTeam, FantasyTeam.user_id == User.id)
+        .join(Match, Match.id == FantasyTeam.match_id)
         .where(User.role != UserRole.ADMIN)
+        .where(Match.status == MatchStatus.COMPLETED)
         .group_by(User.id, User.username)
         .order_by(
             desc("total_points"),

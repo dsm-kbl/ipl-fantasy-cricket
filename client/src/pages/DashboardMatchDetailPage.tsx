@@ -51,8 +51,16 @@ export default function DashboardMatchDetailPage() {
     );
   }
 
-  const { match, players, total_score } = detail;
+  const { match, players, total_score, toss_prediction, motm_prediction, motm_player_name } = detail;
   const date = new Date(match.start_time);
+
+  const isCompleted = match.status === "COMPLETED";
+  const tossCorrect = isCompleted && match.toss_winner && toss_prediction
+    ? toss_prediction.trim().toLowerCase() === match.toss_winner.trim().toLowerCase()
+    : null;
+  const motmCorrect = isCompleted && match.motm_player_id && motm_prediction
+    ? motm_prediction === match.motm_player_id
+    : null;
 
   return (
     <PageBackground>
@@ -71,6 +79,46 @@ export default function DashboardMatchDetailPage() {
             <span className="text-lg font-extrabold">Score: {total_score} pts</span>
           </div>
         </div>
+
+        {/* Bonus Predictions */}
+        {(toss_prediction || motm_prediction) && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div className="px-5 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">🎯 Bonus Predictions</h2>
+            </div>
+            <div className="px-5 py-4 space-y-3">
+              {toss_prediction && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-500">🪙 Toss Winner</p>
+                    <p className="text-sm font-medium text-gray-900">{toss_prediction}</p>
+                  </div>
+                  {tossCorrect !== null && (
+                    <span className={`text-sm font-semibold px-3 py-1 rounded-full ${tossCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                      {tossCorrect ? "✅ +10 pts" : "❌ 0 pts"}
+                    </span>
+                  )}
+                </div>
+              )}
+              {motm_prediction && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-500">⭐ Man of the Match</p>
+                    <p className="text-sm font-medium text-gray-900">{motm_player_name || "Unknown player"}</p>
+                  </div>
+                  {motmCorrect !== null && (
+                    <span className={`text-sm font-semibold px-3 py-1 rounded-full ${motmCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                      {motmCorrect ? "✅ +25 pts" : "❌ 0 pts"}
+                    </span>
+                  )}
+                </div>
+              )}
+              {!isCompleted && (
+                <p className="text-xs text-gray-400">Results will be shown after the match is completed.</p>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Team composition */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">

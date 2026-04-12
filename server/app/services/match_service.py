@@ -81,6 +81,17 @@ async def get_upcoming_matches(db: AsyncSession) -> list[MatchOut]:
     return [MatchOut.model_validate(m) for m in matches]
 
 
+async def get_completed_matches(db: AsyncSession) -> list[MatchOut]:
+    """Return all completed matches, most recent first."""
+    result = await db.execute(
+        select(Match)
+        .where(Match.status == MatchStatus.COMPLETED)
+        .order_by(Match.start_time.desc())
+    )
+    matches = result.scalars().all()
+    return [MatchOut.model_validate(m) for m in matches]
+
+
 async def get_all_matches(db: AsyncSession) -> list[MatchOut]:
     """Return all matches regardless of status, with completed matches last."""
     result = await db.execute(

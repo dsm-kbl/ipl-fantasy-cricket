@@ -260,6 +260,18 @@ function YourXI({
         </div>
       )}
 
+      {locked && (tossPrediction || motmPrediction) && (
+        <div className="px-3 py-2 bg-gray-50 border-x border-gray-200 space-y-1">
+          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Your Predictions</p>
+          {tossPrediction && (
+            <p className="text-xs text-gray-700">🪙 Toss: <span className="font-medium">{tossPrediction}</span></p>
+          )}
+          {motmPrediction && (
+            <p className="text-xs text-gray-700">⭐ MOTM: <span className="font-medium">{allPlayers.find(p => p.id === motmPrediction)?.name || "—"}</span></p>
+          )}
+        </div>
+      )}
+
       {/* Player list */}
       <div className="flex-1 overflow-y-auto bg-white border-x border-gray-200 divide-y divide-gray-100">
         {players.length === 0 ? (

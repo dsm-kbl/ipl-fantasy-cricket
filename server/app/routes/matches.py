@@ -22,6 +22,14 @@ async def list_upcoming_matches(
     return await match_service.get_upcoming_matches(db)
 
 
+@router.get("/completed", response_model=list[MatchOut])
+async def list_completed_matches(
+    db: AsyncSession = Depends(get_db),
+):
+    """Return all completed matches, most recent first."""
+    return await match_service.get_completed_matches(db)
+
+
 @router.get("/{match_id}", response_model=MatchWithPlayers)
 async def get_match_detail(
     match_id: uuid.UUID,

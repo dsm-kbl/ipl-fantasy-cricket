@@ -39,7 +39,7 @@ export default function LeaderboardPage() {
     if (tab !== "per-match") return;
     setEntries([]);
     setSelectedMatchId("");
-    apiClient.get<MatchOut[]>("/matches").then((res) => setMatches(res.data)).catch(() => {});
+    apiClient.get<MatchOut[]>("/matches/completed").then((res) => setMatches(res.data)).catch(() => {});
   }, [tab]);
 
   useEffect(() => {
