@@ -1,7 +1,11 @@
-# Environment files (contain secrets)
+# Secrets
 .env
 *.env
 server/.env
+
+# Database dumps
+*.sql
+backup*.sql
 
 # Python
 __pycache__/
@@ -14,22 +18,13 @@ node_modules/
 client/node_modules/
 client/dist/
 
-# IDE
+# IDE / tooling
 .vscode/
 .idea/
 .kiro/
+.DS_Store
 *.swp
 *.swo
-.DS_Store
 
-# Database
-*.db
-*.sqlite3
-*.sql
-backup*.sql
-
-# Alembic
-alembic/versions/__pycache__/
-
-# Logs
-*.log
+# Git
+.git/
