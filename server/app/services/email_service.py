@@ -157,8 +157,8 @@ def send_match_reminder_email(
         return False
 
     team_builder_url = f"{settings.frontend_url}/team-builder/{match_id}"
-    urgency_emoji = "⏰" if minutes_to_start >= 45 else "🚨"
-    urgency_text = "Don't miss out!" if minutes_to_start >= 45 else "Hurry, last chance!"
+    urgency_emoji = "⏰" if minutes_to_start >= 105 else "🚨"
+    urgency_text = "Lock in your XI before the 1-hour cutoff." if minutes_to_start >= 105 else "Team selection locks in 30 minutes!"
 
     html = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">

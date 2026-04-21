@@ -19,10 +19,11 @@ IST = timezone(timedelta(hours=5, minutes=30))
 
 # Reminder windows: a cron running every 15 min catches matches that fall in
 # either of these windows. We only send once per (user, match, reminder_type).
+# Lockout is 60 min before match start — so both reminders are sent before then.
 REMINDER_WINDOWS = [
     # type, min_minutes, max_minutes
-    ("60min", 55, 70),
-    ("30min", 25, 40),
+    ("120min", 110, 125),  # ~120 min before start (60 min before lockout)
+    ("90min", 85, 100),    # ~90 min before start (30 min before lockout)
 ]
 
 
