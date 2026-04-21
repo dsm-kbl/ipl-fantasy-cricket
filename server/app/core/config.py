@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     feedback_recipient_email: str = "ipl.fantasy.cricket.xi@gmail.com"
     frontend_url: str = "http://localhost:3000"
 
+    # Cron job secret — shared with cron-job.org for triggering scheduled tasks
+    cron_secret: str = "change-me-in-production"
+
     model_config = {"env_prefix": "APP_", "env_file": ".env", "extra": "ignore"}
 
 

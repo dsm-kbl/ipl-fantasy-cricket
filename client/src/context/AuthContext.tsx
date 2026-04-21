@@ -21,6 +21,7 @@ interface AuthContextType {
     password: string
   ) => Promise<void>;
   logout: () => void;
+  refreshUser: (user: UserOut) => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -84,6 +85,11 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     setUser(null);
   }, []);
 
+  const refreshUser = useCallback(async (updatedUser: UserOut) => {
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }, []);
+
   const value: AuthContextType = useMemo(
     () => ({
       user,
@@ -92,10 +98,11 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       login,
       register,
       logout,
+      refreshUser,
       isAuthenticated: !!token && !!user,
       isAdmin: user?.role === "ADMIN",
     }),
-    [user, token, isLoading, login, register, logout]
+    [user, token, isLoading, login, register, logout, refreshUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

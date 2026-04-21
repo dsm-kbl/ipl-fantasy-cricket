@@ -22,8 +22,13 @@ class UserOut(BaseModel):
     email: str
     role: str
     is_verified: bool
+    notifications_enabled: bool = True
 
 
 class AuthTokenResponse(BaseModel):
     user: UserOut
     token: str
+
+
+class UpdateSettingsRequest(BaseModel):
+    notifications_enabled: bool

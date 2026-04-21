@@ -49,6 +49,7 @@ PLAYERS = [
     ("Ashwani Kumar", PlayerRole.BOWLER, MI, 6.5),
     ("Mohd Izhar", PlayerRole.BOWLER, MI, 6.0),
     ("Raghu Sharma", PlayerRole.BOWLER, MI, 6.5),
+    ("Krish Bhagat", PlayerRole.BOWLER, MI, 6.0),
 
     # Chennai Super Kings (IPL 2026 actual squad from ESPNcricinfo)
     # Batters
@@ -312,6 +313,7 @@ PLAYERS = [
     ("Praful Hinge", PlayerRole.BOWLER, SRH, 6.0),
     ("Onkar Tarmale", PlayerRole.BOWLER, SRH, 6.0),
     ("Zeeshan Ansari", PlayerRole.BOWLER, SRH, 6.0),
+    ("Dilshan Madushanka", PlayerRole.BOWLER, SRH, 7.0),
 ]
 
 # Real IPL 2026 schedule from ESPNcricinfo

@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from server.app.core.config import settings
 from server.app.core.exceptions import AppError
-from server.app.routes import admin, auth, dashboard, fantasy_teams, feedback, leaderboard, matches
+from server.app.routes import admin, auth, cron, dashboard, fantasy_teams, feedback, leaderboard, matches
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +124,7 @@ app.include_router(fantasy_teams.router)
 app.include_router(leaderboard.router)
 app.include_router(dashboard.router)
 app.include_router(feedback.router)
+app.include_router(cron.router)
 
 
 @app.get("/health")

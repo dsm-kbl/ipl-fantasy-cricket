@@ -6,6 +6,7 @@ export interface UserOut {
   email: string;
   role: string;
   is_verified: boolean;
+  notifications_enabled: boolean;
 }
 
 export interface AuthTokenResponse {

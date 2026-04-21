@@ -14,6 +14,7 @@ from server.app.schemas.auth import (
     AuthTokenResponse,
     LoginRequest,
     RegisterRequest,
+    UpdateSettingsRequest,
     UserOut,
 )
 from server.app.services.auth_service import AuthError
@@ -116,4 +117,17 @@ async def logout(current_user: User = Depends(get_current_user)):
 @router.get("/me", response_model=UserOut)
 async def me(current_user: User = Depends(get_current_user)):
     """Return the currently authenticated user."""
+    return UserOut.model_validate(current_user)
+
+
+@router.patch("/settings", response_model=UserOut)
+async def update_settings(
+    body: UpdateSettingsRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update user notification settings."""
+    current_user.notifications_enabled = body.notifications_enabled
+    await db.commit()
+    await db.refresh(current_user)
     return UserOut.model_validate(current_user)

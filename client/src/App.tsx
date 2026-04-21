@@ -15,6 +15,7 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import PlayerManagementPage from "./pages/admin/PlayerManagementPage";
 import MatchManagementPage from "./pages/admin/MatchManagementPage";
 import PointsEntryPage from "./pages/admin/PointsEntryPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   return (
@@ -72,6 +73,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <LeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

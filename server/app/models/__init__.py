@@ -4,6 +4,7 @@ from server.app.models.player import Player, PlayerRole
 from server.app.models.match import Match, MatchStatus
 from server.app.models.fantasy_team import FantasyTeam, FantasyTeamPlayer
 from server.app.models.performance_point import PerformancePoint
+from server.app.models.match_reminder import MatchReminderSent
 
 __all__ = [
     "User",
@@ -15,4 +16,5 @@ __all__ = [
     "FantasyTeam",
     "FantasyTeamPlayer",
     "PerformancePoint",
+    "MatchReminderSent",
 ]
