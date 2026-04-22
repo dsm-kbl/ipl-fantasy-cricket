@@ -157,8 +157,23 @@ def send_match_reminder_email(
         return False
 
     team_builder_url = f"{settings.frontend_url}/team-builder/{match_id}"
-    urgency_emoji = "⏰" if minutes_to_start >= 105 else "🚨"
-    urgency_text = "Lock in your XI before the 1-hour cutoff." if minutes_to_start >= 105 else "Team selection locks in 30 minutes!"
+    settings_url = f"{settings.frontend_url}/settings"
+    hours_to_lockout = max(0, minutes_to_start - 60)
+
+    plain_text = f"""Hi {username},
+
+Your team for {team_a} vs {team_b} isn't locked in yet.
+
+Match starts at {start_time_ist} IST. Team selection closes 1 hour before start ({hours_to_lockout} minutes from now).
+
+Pick your XI here: {team_builder_url}
+
+Good luck!
+
+---
+IPL Fantasy Cricket
+Manage notification preferences: {settings_url}
+"""
 
     html = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -167,30 +182,25 @@ def send_match_reminder_email(
             <h1 style="color: #1e40af; margin: 10px 0 0;">IPL Fantasy Cricket</h1>
         </div>
         <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 32px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <span style="font-size: 32px;">{urgency_emoji}</span>
-            </div>
-            <h2 style="color: #111827; margin-top: 0; text-align: center;">Hey {username}, build your team!</h2>
-            <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 15px;">
-                <strong>{team_a} vs {team_b}</strong> starts in about <strong>{minutes_to_start} minutes</strong>.<br>
-                {urgency_text} Team selection locks 1 hour before the match starts.
+            <h2 style="color: #111827; margin-top: 0;">Hi {username},</h2>
+            <p style="color: #374151; line-height: 1.6; font-size: 15px;">
+                Your team for <strong>{team_a} vs {team_b}</strong> isn't locked in yet.
             </p>
-            <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;">
-                <p style="margin: 0; color: #374151; font-size: 14px;">
-                    🕐 Match starts at <strong>{start_time_ist} IST</strong>
-                </p>
-            </div>
+            <p style="color: #374151; line-height: 1.6; font-size: 15px;">
+                Match starts at <strong>{start_time_ist} IST</strong>. Team selection closes 1 hour before start — that's about {hours_to_lockout} minutes from now.
+            </p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="{team_builder_url}" style="background: linear-gradient(to right, #2563eb, #4f46e5); color: white; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">
-                    Build Your XI Now
+                <a href="{team_builder_url}" style="background: #2563eb; color: white; padding: 14px 36px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">
+                    Pick Your XI
                 </a>
             </div>
-            <p style="color: #9ca3af; font-size: 12px; line-height: 1.5; text-align: center;">
-                You're receiving this because you have an account on IPL Fantasy Cricket. To stop these reminders, disable notifications in your account settings.
+            <p style="color: #6b7280; line-height: 1.5; font-size: 13px; text-align: center; margin-top: 24px;">
+                Good luck!
             </p>
         </div>
         <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
-            IPL Fantasy Cricket 2026 — Build. Compete. Win.
+            You're receiving this because you have a verified IPL Fantasy Cricket account.<br>
+            <a href="{settings_url}" style="color: #6b7280;">Manage notification preferences</a>
         </p>
     </div>
     """
@@ -204,8 +214,14 @@ def send_match_reminder_email(
                     {
                         "From": {"Email": settings.mailjet_sender_email, "Name": "IPL Fantasy Cricket"},
                         "To": [{"Email": to_email, "Name": username}],
-                        "Subject": f"{urgency_emoji} {team_a} vs {team_b} starts in {minutes_to_start} min — Build your team!",
+                        "ReplyTo": {"Email": settings.feedback_recipient_email, "Name": "IPL Fantasy"},
+                        "Subject": f"Build your team for {team_a} vs {team_b}",
+                        "TextPart": plain_text,
                         "HTMLPart": html,
+                        "Headers": {
+                            "List-Unsubscribe": f"<{settings_url}>",
+                            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+                        },
                     }
                 ]
             },
