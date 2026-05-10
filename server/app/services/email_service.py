@@ -1,15 +1,16 @@
-"""Email service for sending verification emails via Mailjet HTTP API."""
+"""Email service using Gmail SMTP for better deliverability."""
 
 import logging
-
-import httpx
+import smtplib
+import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formataddr, make_msgid
 
 from server.app.core.config import settings
 from server.app.core.security import create_access_token
 
 logger = logging.getLogger(__name__)
-
-MAILJET_API_URL = "https://api.mailjet.com/v3.1/send"
 
 
 def generate_verification_token(user_id: str) -> str:
@@ -18,15 +19,65 @@ def generate_verification_token(user_id: str) -> str:
     return create_access_token(subject=user_id, expires_delta=timedelta(hours=24))
 
 
-def send_verification_email(to_email: str, username: str, token: str) -> bool:
-    """Send a verification email via Mailjet HTTP API."""
-    if not settings.mailjet_api_key or not settings.mailjet_secret_key:
-        logger.warning("Mailjet API keys not configured — skipping verification email")
+def _send_smtp(
+    to_email: str,
+    to_name: str,
+    subject: str,
+    html_body: str,
+    text_body: str,
+    reply_to: str | None = None,
+    extra_headers: dict[str, str] | None = None,
+) -> bool:
+    """Send an email via Gmail SMTP. Returns True on success."""
+    if not settings.smtp_user or not settings.smtp_password:
+        logger.warning("Gmail SMTP not configured — skipping email")
         return False
 
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = formataddr((settings.smtp_sender_name, settings.smtp_sender_email))
+    msg["To"] = formataddr((to_name, to_email))
+    msg["Message-ID"] = make_msgid(domain=settings.smtp_sender_email.split("@")[-1])
+    if reply_to:
+        msg["Reply-To"] = reply_to
+    if extra_headers:
+        for key, value in extra_headers.items():
+            msg[key] = value
+
+    msg.attach(MIMEText(text_body, "plain", "utf-8"))
+    msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+    try:
+        context = ssl.create_default_context()
+        with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15) as server:
+            server.starttls(context=context)
+            server.login(settings.smtp_user, settings.smtp_password)
+            server.send_message(msg)
+        logger.info("Email sent to %s (subject: %s)", to_email, subject)
+        return True
+    except Exception as exc:
+        logger.error("Failed to send email to %s: %s", to_email, exc)
+        return False
+
+
+def send_verification_email(to_email: str, username: str, token: str) -> bool:
+    """Send a verification email via Gmail SMTP."""
     verify_url = f"{settings.frontend_url}/verify-email?token={token}"
 
-    html = f"""
+    text_body = f"""Hi {username},
+
+Welcome to IPL Fantasy Cricket 2026!
+
+Please verify your email address by clicking the link below:
+{verify_url}
+
+This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
+
+---
+IPL Fantasy Cricket
+"""
+
+    html_body = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
             <span style="font-size: 48px;">🏏</span>
@@ -38,7 +89,7 @@ def send_verification_email(to_email: str, username: str, token: str) -> bool:
                 Thanks for signing up for IPL Fantasy Cricket 2026. Please verify your email address to activate your account and start building your dream XI.
             </p>
             <div style="text-align: center; margin: 30px 0;">
-                <a href="{verify_url}" style="background: linear-gradient(to right, #2563eb, #4f46e5); color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
+                <a href="{verify_url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
                     Verify Email Address
                 </a>
             </div>
@@ -46,57 +97,27 @@ def send_verification_email(to_email: str, username: str, token: str) -> bool:
                 This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
             </p>
         </div>
-        <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px;">
-            IPL Fantasy Cricket 2026 — Build. Compete. Win.
-        </p>
     </div>
     """
 
-    try:
-        response = httpx.post(
-            MAILJET_API_URL,
-            auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
-            json={
-                "Messages": [
-                    {
-                        "From": {"Email": settings.mailjet_sender_email, "Name": "IPL Fantasy Cricket"},
-                        "To": [{"Email": to_email, "Name": username}],
-                        "Subject": "Verify your IPL Fantasy Cricket account",
-                        "HTMLPart": html,
-                    }
-                ]
-            },
-            timeout=10.0,
-        )
-        if response.status_code == 200:
-            data = response.json()
-            status = data.get("Messages", [{}])[0].get("Status")
-            if status == "success":
-                logger.info("Verification email sent to %s", to_email)
-                return True
-            else:
-                logger.error("Mailjet send failed: %s", data)
-                return False
-        else:
-            logger.error("Mailjet API error: %s %s", response.status_code, response.text)
-            return False
-    except Exception as exc:
-        logger.error("Failed to send verification email: %s", exc)
-        return False
+    return _send_smtp(
+        to_email=to_email,
+        to_name=username,
+        subject="Verify your IPL Fantasy Cricket account",
+        html_body=html_body,
+        text_body=text_body,
+    )
 
 
 def send_feedback_email(username: str, user_email: str, message: str) -> bool:
     """Send a feedback email from a user to the admin."""
-    if not settings.mailjet_api_key or not settings.mailjet_secret_key:
-        logger.warning("Mailjet API keys not configured — skipping feedback email")
-        return False
+    text_body = f"""Feedback from {username} ({user_email}):
 
-    html = f"""
+{message}
+"""
+
+    html_body = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <span style="font-size: 48px;">🏏</span>
-            <h1 style="color: #1e40af; margin: 10px 0 0;">IPL Fantasy — Feedback</h1>
-        </div>
         <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 32px;">
             <p style="color: #6b7280; font-size: 14px; margin-top: 0;"><strong>From:</strong> {username} ({user_email})</p>
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;">
@@ -105,38 +126,14 @@ def send_feedback_email(username: str, user_email: str, message: str) -> bool:
     </div>
     """
 
-    try:
-        response = httpx.post(
-            MAILJET_API_URL,
-            auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
-            json={
-                "Messages": [
-                    {
-                        "From": {"Email": settings.mailjet_sender_email, "Name": "IPL Fantasy Feedback"},
-                        "To": [{"Email": settings.feedback_recipient_email, "Name": "Admin"}],
-                        "ReplyTo": {"Email": user_email, "Name": username},
-                        "Subject": f"Feedback from {username}",
-                        "HTMLPart": html,
-                    }
-                ]
-            },
-            timeout=10.0,
-        )
-        if response.status_code == 200:
-            data = response.json()
-            status = data.get("Messages", [{}])[0].get("Status")
-            if status == "success":
-                logger.info("Feedback email sent from %s", username)
-                return True
-            else:
-                logger.error("Mailjet feedback send failed: %s", data)
-                return False
-        else:
-            logger.error("Mailjet API error: %s %s", response.status_code, response.text)
-            return False
-    except Exception as exc:
-        logger.error("Failed to send feedback email: %s", exc)
-        return False
+    return _send_smtp(
+        to_email=settings.feedback_recipient_email,
+        to_name="Admin",
+        subject=f"Feedback from {username}",
+        html_body=html_body,
+        text_body=text_body,
+        reply_to=user_email,
+    )
 
 
 def send_match_reminder_email(
@@ -148,19 +145,12 @@ def send_match_reminder_email(
     minutes_to_start: int,
     match_id: str,
 ) -> bool:
-    """Send a match reminder email via Mailjet HTTP API.
-
-    Reminds the user to build their team for an upcoming match.
-    """
-    if not settings.mailjet_api_key or not settings.mailjet_secret_key:
-        logger.warning("Mailjet API keys not configured — skipping match reminder email")
-        return False
-
+    """Send a match reminder email via Gmail SMTP."""
     team_builder_url = f"{settings.frontend_url}/team-builder/{match_id}"
     settings_url = f"{settings.frontend_url}/settings"
     hours_to_lockout = max(0, minutes_to_start - 60)
 
-    plain_text = f"""Hi {username},
+    text_body = f"""Hi {username},
 
 Your team for {team_a} vs {team_b} isn't locked in yet.
 
@@ -175,7 +165,7 @@ IPL Fantasy Cricket
 Manage notification preferences: {settings_url}
 """
 
-    html = f"""
+    html_body = f"""
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <div style="text-align: center; margin-bottom: 30px;">
             <span style="font-size: 48px;">🏏</span>
@@ -205,38 +195,15 @@ Manage notification preferences: {settings_url}
     </div>
     """
 
-    try:
-        response = httpx.post(
-            MAILJET_API_URL,
-            auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
-            json={
-                "Messages": [
-                    {
-                        "From": {"Email": settings.mailjet_sender_email, "Name": "IPL Fantasy Cricket"},
-                        "To": [{"Email": to_email, "Name": username}],
-                        "ReplyTo": {"Email": settings.feedback_recipient_email, "Name": "IPL Fantasy"},
-                        "Subject": f"Build your team for {team_a} vs {team_b}",
-                        "TextPart": plain_text,
-                        "HTMLPart": html,
-                        "Headers": {
-                            "List-Unsubscribe": f"<{settings_url}>",
-                            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-                        },
-                    }
-                ]
-            },
-            timeout=10.0,
-        )
-        if response.status_code == 200:
-            data = response.json()
-            status = data.get("Messages", [{}])[0].get("Status")
-            if status == "success":
-                logger.info("Match reminder email sent to %s (%s min)", to_email, minutes_to_start)
-                return True
-            logger.error("Mailjet reminder send failed: %s", data)
-            return False
-        logger.error("Mailjet API error: %s %s", response.status_code, response.text)
-        return False
-    except Exception as exc:
-        logger.error("Failed to send match reminder email: %s", exc)
-        return False
+    return _send_smtp(
+        to_email=to_email,
+        to_name=username,
+        subject=f"Build your team for {team_a} vs {team_b}",
+        html_body=html_body,
+        text_body=text_body,
+        reply_to=settings.feedback_recipient_email,
+        extra_headers={
+            "List-Unsubscribe": f"<{settings_url}>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+    )

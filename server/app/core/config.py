@@ -15,12 +15,20 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: str = "http://localhost:5173,http://localhost:3000"
 
-    # Email (Mailjet HTTP API)
+    # Email (Mailjet HTTP API — legacy)
     mailjet_api_key: str = ""
     mailjet_secret_key: str = ""
     mailjet_sender_email: str = "ipl.fantasy.cricket.xi@gmail.com"
     feedback_recipient_email: str = "ipl.fantasy.cricket.xi@gmail.com"
     frontend_url: str = "http://localhost:3000"
+
+    # Email (Gmail SMTP — primary)
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str = ""  # Gmail address
+    smtp_password: str = ""  # Gmail App Password (16 chars, no spaces)
+    smtp_sender_email: str = "ipl.fantasy.cricket.xi@gmail.com"
+    smtp_sender_name: str = "IPL Fantasy Cricket"
 
     # Cron job secret — shared with cron-job.org for triggering scheduled tasks
     cron_secret: str = "change-me-in-production"
